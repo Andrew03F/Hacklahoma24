@@ -1,24 +1,26 @@
 let spaceShip = {
-  positionX: 1050, // Start near Earth
+  positionX: 1150, // Start near Earth
   positionY: 350,
   accelerationMagnitude: 0,
   acceleration: { ax: 0, ay: 0 },
-  speed: { dx: 0, dy: 0 },
-  angle: 135,
+  speed: { dx: 0, dy: -2 },
+  angle: 180,
   angularAcc: 0,
   angularVel: 0,
   baseAcceleration: .1,
-  baseAngularAcceleration: .1
+  baseAngularAcceleration: 1
 };
 
+let planetDensity = 2;
+let gravityConstant = .00001;
 // Adjusted solar system with larger planet sizes
 let solarSystem = [
-  ["Sun", -500, 350, 1000, 'yellow'], // Increased size for visibility
-  ["Mercury", 250, 350, 25, 'darkgrey'], // Larger than before, but still the smallest planet
-  ["Venus", 400, 350, 50, 'orange'], // Increased size, closer to Earth
-  ["Earth", 1000, 350, 200, 'blue'], // Significantly larger, as requested
-  ["Mars", 1300, 350, 35, 'red'], // Larger, maintaining relative size to Earth
-  ["Jupiter", 1900, 350, 280, 'orange'] // Much larger, reflecting its status as the largest planet
+  // ["Sun", -500, 350, 300, 'yellow'], // Increased size for visibility
+  // ["Mercury", 250, 350, 25, 'darkgrey'], // Larger than before, but still the smallest planet
+  // ["Venus", 400, 350, 50, 'orange'], // Increased size, closer to Earth
+  ["Earth", 1000, 350, 200, 'blue'], // Significantly larger
+  // ["Mars", 1300, 350, 35, 'red'], // Larger, maintaining relative size to Earth
+  // ["Jupiter", 1900, 350, 280, 'orange'] // Much larger, reflecting its status as the largest planet
 ];
 
 let camX = 0;
@@ -33,7 +35,6 @@ function setup() {
 
 function draw() {
   background(20);
-
   handleInput();
   updatePosition();
   updateCamera();
@@ -56,6 +57,7 @@ function handleInput() {
   if (keyIsDown(UP_ARROW) || keyIsDown(87)) { // Accelerate forward
     spaceShip.accelerationMagnitude = spaceShip.baseAcceleration;
   }
+
 }
 
 
@@ -63,6 +65,11 @@ function updatePosition() {
   // Update linear acceleration based on current angle
   spaceShip.acceleration.ax = sin(spaceShip.angle) * spaceShip.accelerationMagnitude;
   spaceShip.acceleration.ay = cos(spaceShip.angle) * spaceShip.accelerationMagnitude;
+
+  // Update acceleration due to gravity
+  let accFromGravity = getAccDueToGravity();
+  spaceShip.acceleration.ax += accFromGravity[0];
+  spaceShip.acceleration.ay += accFromGravity[1];
 
   // Update speed with acceleration
   spaceShip.speed.dx += spaceShip.acceleration.ax;
@@ -76,6 +83,7 @@ function updatePosition() {
   spaceShip.angularVel += spaceShip.angularAcc;
   spaceShip.angularVel *= .9;
   spaceShip.angle += spaceShip.angularVel;
+  console.log(spaceShip.positionX, spaceShip.positionY)
 }
 
 function updateCamera() {
@@ -102,5 +110,38 @@ function drawSpaceShip() {
   pop();
 }
 
+function calculateDistance(x1, y1, x2, y2) {
+  const deltaX = x2 - x1;
+  const deltaY = y2 - y1;
+  
+  // Euclidean distance formula: √((x2 - x1)^2 + (y2 - y1)^2)
+  const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+  
+  return distance;
+}
 
+function getAccDueToGravity() {
+  let accDueToGravity = [0, 0];
+  solarSystem.forEach(body => {
+    // acceleration in x direction
+    let distanceToBody  = calculateDistance(body[1], body[2], spaceShip.positionX, spaceShip.positionY);
+    if (distanceToBody > 30) {
+      accDueToGravity[0] +=  calculateMass(body[3], planetDensity) * gravityConstant * (body[1] - spaceShip.positionX) 
+                            / Math.pow(distanceToBody, 3);
+      accDueToGravity[1] +=  calculateMass(body[3], planetDensity) * gravityConstant *  - (body[2] - spaceShip.positionY) 
+                            / Math.pow(distanceToBody, 3);
+    }
+  });
+  
+  return accDueToGravity
+}
 
+function calculateMass(radius, density) {
+  // Calculate volume using the formula for volume of a sphere
+  const volume = (4/3) * Math.PI * Math.pow(radius, 3);
+  
+  // Calculate mass by multiplying volume by density
+  const mass = volume * density;
+  
+  return mass;
+}
