@@ -24,15 +24,22 @@ let solarSystem = [
 let camX = 0;
 let camY = 0;
 
+let stars = [];
+
 function setup() {
   createCanvas(1024, 569, document.getElementById("game"));
+  
+  for(let i = 0; i < 100; i++) {
+      stars.push(new Star());
+  }
+
   angleMode(DEGREES);
   camX = spaceShip.positionX - width / 2; // Center horizontally on the spaceship at start
   camY = spaceShip.positionY - height / 2; // Center vertically on the spaceship at start
 }
 
 function draw() {
-  background(20);
+  drawStarfield();
 
   handleInput();
   updatePosition();
@@ -102,5 +109,36 @@ function drawSpaceShip() {
   pop();
 }
 
+function drawStarfield() {
+    background(20);
+    
+    for(let i = 0; i < stars.length; i++) {
+        stars[i].show();
+        stars[i].update();
+    }
+    
+}
 
-
+class Star {
+    constructor() {
+        this.x = random(width);
+        this.y = random(height);
+        this.size = random(1,4);
+        this.speed = random(1,3);
+    }
+    
+    show() {
+        noStroke();
+        fill(255);
+        ellipse(this.x, this.y, this.size);
+    }
+    
+    update() {
+        this.x -= this.speed;
+        
+        if(this.x < -this.size) {
+            this.x = width + this.size;
+            this.y = random(height);
+        }
+    }
+}
