@@ -25,7 +25,7 @@ let camX = 0;
 let camY = 0;
 
 function setup() {
-  createCanvas(windowWidth, windowHeight);
+  createCanvas(1024, 569, document.getElementById("game"));
   angleMode(DEGREES);
   camX = spaceShip.positionX - width / 2; // Center horizontally on the spaceship at start
   camY = spaceShip.positionY - height / 2; // Center vertically on the spaceship at start
