@@ -1,6 +1,6 @@
 
 function setup() {
-    createCanvas(1800, 1000 );
+    createCanvas(512, 384, document.getElementById("game"));
     background(50)
   }
   

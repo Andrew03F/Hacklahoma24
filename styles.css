@@ -1,3 +1,18 @@
 body {
-    background-color: plum
+    background-color: plum;
+    height: 100vh;
+    margin: 0;
+    justify-content: center;
+    background-size: cover;
+    background-position: center;
+}
+
+canvas {
+    max-width: 100%;
+    object-fit: contain;
+    padding-left: 0;
+    padding-right: 0;
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
 }
