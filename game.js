@@ -31,6 +31,7 @@ function draw() {
   if (keyIsDown(LEFT_ARROW) || keyIsDown(65)) {
     spaceShip.angularAcc = -spaceShip.baseAngularAcceleration;
   }
+
   if (keyIsDown(RIGHT_ARROW)|| keyIsDown(68)) {
     spaceShip.angularAcc = spaceShip.baseAngularAcceleration;
   }
@@ -70,3 +71,4 @@ function updatePosition() {
 /////
 
   
+
