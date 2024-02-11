@@ -23,7 +23,7 @@ let solarSystem = [
   // ["Venus", 400, 350, 50, 'orange'], // Increased size, closer to Earth
   ["Earth", 1000, 350, 200, 'blue'], // Significantly larger
   ["Moon", 1400, 700, 48, 'blue'], // Larger, maintaining relative size to Earth
-  // ["Jupiter", 1900, 350, 280, 'orange'] // Much larger, reflecting its status as the largest planet
+  ["Mars", 3000, -350, 200, 'orange'] 
 ];
 
 //METEORS Creation
@@ -50,6 +50,7 @@ let spaceShipMovingImage; // For the moving state
 let spaceShipFlickerMovingImage;
 let moonImage;
 let blackHoleImage;
+let redPlanetImage;
 
 let spaceShipFlickerImage1; // For the flicker effect
 let spaceShipFlickerImage2; // For the flicker effect
@@ -63,15 +64,24 @@ let fuelBarImage;
 
 function preload() {
   meteorImage = loadImage('./Meteor.png'); // Load the meteor image
+<<<<<<< HEAD
   spaceShipIdleImage = loadImage('./assets/ship1.png');
   spaceShipMovingImage = loadImage('./assets/ship2.png');
   spaceShipFlickerImage1 = loadImage('./assets/ship2.png'); // Replace with the correct path if necessary
   spaceShipFlickerImage2 = loadImage('./assets/ship3.png'); // Replace with the correct path if necessary
   spaceShipImage4 = loadImage('./assets/ship4.png');
   spaceShipImage5 = loadImage('./assets/ship5.png');
+=======
+  spaceShipIdleImage = loadImage('./alien0.png');
+  spaceShipMovingImage = loadImage('./alien.png');
+
+  // planets
+>>>>>>> mars
   earthImage = loadImage('./earth.png');
   moonImage = loadImage('./moon.png');
+  redPlanetImage = loadImage('./assets/redPlanet.png')
   blackHoleImage = loadImage('./blackHole.png')
+
   font = loadFont('./assets/power-clear.ttf');
   fuelIconImage = loadImage('./Fuel.png');
   fuelBarImage = loadImage('./fuelbar.png');
@@ -383,6 +393,9 @@ function drawSolarSystem() {
     }
     if (body[0] === 'BlackHole') {
       image(blackHoleImage, body[1] - camX - 421, body[2] - camY - body[3]/ 2 - 30);
+    }
+    if (body[0] === 'Mars') {
+      image(redPlanetImage, body[1] - camX - body[3] / 2, body[2] - camY - body[3]/ 2 );
     }
   });
 }
