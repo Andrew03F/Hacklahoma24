@@ -68,6 +68,7 @@ let showMissionText = true;
 let introSound;
 let missionSound;
 let endSound;
+let winSound;
 
 function preload() {
   meteorImage = loadImage('./Meteor.png'); // Load the meteor image
@@ -87,8 +88,9 @@ function preload() {
   fuelBarImage = loadImage('./fuelbar.png');
 
   introSound = loadSound('./assets/intro.wav');
-  missionSound = loadSound('./assets/mission.wav');
+  missionSound = loadSound('./assets/mission.mp3');
   endSound = loadSound('./assets/end.wav');
+  winSound = loadSound('./assets/win.wav')
 }
 
 
@@ -147,6 +149,11 @@ function draw() {
     }
     drawCollisionEndGameScreen();
   }else if (gameState === "win") {
+    if (!winSound.isPlaying()) { // Check if the sound is not already playing
+      winSound.play();
+      missionSound.pause();
+      introSound.pause();
+    }
     drawWinScreen(); // Draw the win screen when in win state
   }
 
@@ -392,7 +399,7 @@ function drawMissionText() {
 
       let xPosition = 90; // Starting X position of the fuel bar
       let yPosition = 75; // Adjust Y position so it appears under the fuel bar
-      fill('red'); // White color for the text
+      fill(224,201,251);
       textSize(32);
       textAlign(LEFT, TOP);
       text("Mission: Find Mars", xPosition, yPosition);
@@ -408,9 +415,13 @@ function handleInput() {
   isMoving = false; //not moving initially
 
   if (spaceShip.fuel > 0) { // Check if there's fuel
-    if (keyIsDown(LEFT_ARROW) || keyIsDown(65) || keyIsDown(RIGHT_ARROW) || keyIsDown(68) || keyIsDown(UP_ARROW) || keyIsDown(87)) {
+    if (keyIsDown(LEFT_ARROW) || keyIsDown(65) || keyIsDown(RIGHT_ARROW) || keyIsDown(68)) {
       isMoving = true; // Set to true if any movement key is pressed
       spaceShip.fuel -= 0.1; // Consume fuel, adjust rate as needed
+    }
+    if (keyIsDown(UP_ARROW) || keyIsDown(87)) {
+      isMoving = true;
+      spaceShip.fuel -= 0.2;
     }
   }
 
