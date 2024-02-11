@@ -263,37 +263,37 @@ function keyPressed() {
   } else if (gameState === "endGame" && keyCode === ENTER) {
     gameState = "startScreen"; // Change back to start screen
     // Reset spaceship properties
-    spaceShip.positionX = 1150; // Reset to starting position near Earth
+    spaceShip.positionX = 1220; // Reset to starting position near Earth
     spaceShip.positionY = 350;
     spaceShip.speed.dx = 0; // Reset any movement speed
-    spaceShip.speed.dy = -2;
+    spaceShip.speed.dy = -2.45;
     spaceShip.angle = 180; // Reset orientation if needed
     spaceShip.fuel = spaceShip.maxFuel; // Refill fuel
   }else if (gameState === "outOfBounds" && keyCode === ENTER) {
     gameState = "startScreen"; // Change back to start screen
     // Reset spaceship properties
-    spaceShip.positionX = 1150; // Reset to starting position near Earth
+    spaceShip.positionX = 1220; // Reset to starting position near Earth
     spaceShip.positionY = 350;
     spaceShip.speed.dx = 0; // Reset any movement speed
-    spaceShip.speed.dy = 0;
+    spaceShip.speed.dy = -2.45;
     spaceShip.angle = 180; // Reset orientation if needed
     spaceShip.fuel = spaceShip.maxFuel; // Refill fuel
   } else if (gameState === "collisionEnd" && keyCode === ENTER) {
     gameState = "startScreen"; // Change back to start screen
     // Reset spaceship properties
-    spaceShip.positionX = 1150; // Reset to starting position near Earth
+    spaceShip.positionX = 1220; // Reset to starting position near Earth
     spaceShip.positionY = 350;
     spaceShip.speed.dx = 0; // Reset any movement speed
-    spaceShip.speed.dy = 0;
+    spaceShip.speed.dy = -2.45;
     spaceShip.angle = 180; // Reset orientation if needed
     spaceShip.fuel = spaceShip.maxFuel; // Refill fuel
   } else if ((gameState === "startScreen" || gameState === "win") && (key === ' ' || keyCode === ENTER)) {
     gameState = "gameplay";
     // Reset game state, including the spaceship's position, speed, angle, and fuel
-    spaceShip.positionX = 1150;
+    spaceShip.positionX = 1220;
     spaceShip.positionY = 350;
     spaceShip.speed.dx = 0;
-    spaceShip.speed.dy = -2;
+    spaceShip.speed.dy = -2.45;
     spaceShip.angle = 180;
     spaceShip.fuel = spaceShip.maxFuel;
   }
