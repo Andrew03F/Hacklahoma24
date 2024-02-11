@@ -125,7 +125,7 @@ function draw() {
   if (gameState === "startScreen") {
     if (!introSound.isPlaying()) { // Check if the sound is not already playing
       introSound.play();
-      winSound.pause();g
+      winSound.pause();
       endSound.pause();
     }
     drawStartScreen();
