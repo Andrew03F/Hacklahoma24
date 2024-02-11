@@ -52,9 +52,16 @@ let camX = 0;
 let camY = 0;
 let gameState = "startScreen"; // Added game state
 
+let stars = [];
+
 function setup() {
   createCanvas(1024, 569, document.getElementById("game"));
   frameRate(60); // Set a consistent frame rate
+  
+  for(let i = 0; i < 10000; i++) {
+      stars.push(new Star());
+  }
+
   angleMode(DEGREES);
   setupStars();
   camX = spaceShip.positionX - width / 2; // Center horizontally on the spaceship at start
@@ -121,6 +128,7 @@ function drawStars() {
 
 function drawStartScreen() {
   background(20);
+  drawStarfield();
 
   // Update and draw meteors
   updateAndDrawMeteors();
@@ -220,8 +228,8 @@ function updatePosition() {
 
 function updateCamera() {
   // Constrain camera movement within a broad range for exploration
-  camX = constrain(spaceShip.positionX - width / 2, -50000, 50000);
-  camY = constrain(spaceShip.positionY - height / 2, -50000, 50000);
+  camX = constrain(spaceShip.positionX - width / 2, -5000, 5000);
+  camY = constrain(spaceShip.positionY - height / 2, -5000, 5000);
 }
 
 function drawSolarSystem() {
@@ -276,4 +284,41 @@ function calculateMass(radius, density) {
   const mass = volume * density;
   
   return mass;
+}
+function drawStarfield() {
+    background(20);
+    
+    for(let i = 0; i < stars.length; i++) {
+        stars[i].show();
+        stars[i].update();
+    }
+    
+}
+
+class Star {
+    constructor() {
+        let starCoverage = 10000;
+        this.x = random(starCoverage) - starCoverage / 2;
+        this.y = random(starCoverage) - starCoverage / 2;
+        this.size = random(1,4);
+        if (this.size >=2) {
+            this.size = random(1,4);
+        }
+    }
+    
+    show() {
+        noStroke();
+        fill(255);
+        ellipse(this.x -camX, this.y - camY, this.size);
+    }
+    
+    update() {
+        this.x += .1 * -spaceShip.speed.dx * this.size;
+        this.y += .1 * spaceShip.speed.dy * this.size;
+        
+       
+    }
+    setSpeed() {
+        this.speed = this.size * spaceShip.speed.dx
+    }
 }

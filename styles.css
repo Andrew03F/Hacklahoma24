@@ -1,9 +1,10 @@
 body {
+    background-size: contain;
+    background-repeat: repeat-x;
     background-color: plum;
     height: 100vh;
     margin: 0;
     justify-content: center;
-    background-size: cover;
     background-position: center;
 }
 
@@ -16,4 +17,5 @@ canvas {
     margin-left: auto;
     margin-right: auto;
     display: block;
+    background: 
 }
