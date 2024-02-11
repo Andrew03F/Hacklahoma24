@@ -9,7 +9,9 @@ let spaceShip = {
   angularAcc: 0,
   angularVel: 0,
   baseAcceleration: .1,
-  baseAngularAcceleration: 1
+  baseAngularAcceleration: 1,
+  fuel: 100, // Starting fuel level
+  maxFuel: 100, // Maximum fuel capacity
 };
 
 let planetDensity = 2;
@@ -46,10 +48,16 @@ function setupStars() {
 let spaceShipIdleImage; // For the idle state
 let spaceShipMovingImage; // For the moving state
 
+//Fuel icon creation
+let fuelIconImage;
+let fuelBarImage;
+
 function preload() {
   meteorImage = loadImage('./Meteor.png'); // Load the meteor image
   spaceShipIdleImage = loadImage('./alien0.png');
   spaceShipMovingImage = loadImage('./alien.png');
+  fuelIconImage = loadImage('./Fuel.png');
+  fuelBarImage = loadImage('./fuelbar.png');
 }
 
 
@@ -78,6 +86,8 @@ function draw() {
     drawStartScreen();
   } else if (gameState === "gameplay") {
     updateGameplay();
+  } else if (gameState === "endGame") {
+    drawFuelEndGameScreen();
   }
 
   //image(meteorImage, 0, 0)
@@ -165,8 +175,14 @@ function drawTitleText() {
 
 
 function keyPressed() {
-  if (gameState === "startScreen") {
+  if (gameState === "startScreen" && (key === ' ' || keyCode === ENTER)) {
     gameState = "gameplay";
+    spaceShip.fuel = spaceShip.maxFuel; // Reset fuel
+    // You may also want to reset the spaceship position and other properties here
+  } else if (gameState === "endGame" && keyCode === ENTER) {
+    gameState = "startScreen"; // Change back to start screen
+    spaceShip.fuel = spaceShip.maxFuel; // Reset fuel
+    // Again, reset other necessary properties if needed
   }
   return false; // Prevent default behavior
 }
@@ -178,7 +194,36 @@ function mousePressed() {
   return false; // Prevent default behavior
 }
 
+
+function drawFuelEndGameScreen() {
+ drawStarfield(); // Draw the star background first
+
+  textSize(40); // Set the text size
+  textAlign(CENTER, CENTER); // Align text to be centered
+
+  // Blinking effect for "Game Over" text
+  if (frameCount % 60 < 30) {
+    // Yellow shadow
+    fill(255, 255, 0); // Set the shadow color to yellow
+    text("YOU RAN OUT OF FUEL", width / 2 + 5, height / 2 + 5); // Offset the shadow slightly
+
+    // Primary text color
+    fill(255, 0, 0); // Set the primary text color to red
+    text("YOU RAN OUT OF FUEL", width / 2, height / 2); // Draw the primary text on top
+  }
+}
+
+
+
 function updateGameplay() {
+
+   if (spaceShip.fuel <= 0) {
+    // If the fuel is out, change the game state to "endGame"
+    gameState = "endGame";
+    drawFuelEndGameScreen(); // Draw the end game screen immediately
+    return; // Skip drawing the rest of the gameplay elements
+  }
+
   background(20);
   drawStarfield();
   handleInput();
@@ -186,40 +231,24 @@ function updateGameplay() {
   updateCamera();
   drawSolarSystem();
   drawSpaceShip();
+  drawFuelBar();
 }
 
-//function handleInput() {
-//  // Reset acceleration and angular acceleration each frame to ensure it only applies when keys are pressed
-//  spaceShip.accelerationMagnitude = 0;
-//  spaceShip.angularAcc = 0;
-//
-//  if (keyIsDown(LEFT_ARROW) || keyIsDown(65)) { // Turn left
-//    spaceShip.angularAcc = -spaceShip.baseAngularAcceleration;
-//  }
-//  if (keyIsDown(RIGHT_ARROW) || keyIsDown(68)) { // Turn right
-//    spaceShip.angularAcc = spaceShip.baseAngularAcceleration;
-//  }
-//  if (keyIsDown(UP_ARROW) || keyIsDown(87)) { // Accelerate forward
-//    spaceShip.accelerationMagnitude = spaceShip.baseAcceleration;
-//  }
-//
-//}
 
 let isMoving = false; // Tracks whether the spaceship is moving
 
-function handleInput() {
-  // Reset states
-  isMoving = false;
-  spaceShip.accelerationMagnitude = 0;
-  spaceShip.angularAcc = 0;
 
-  // Check for movement keys
-  if (keyIsDown(LEFT_ARROW) || keyIsDown(65) || keyIsDown(RIGHT_ARROW) || keyIsDown(68) || keyIsDown(UP_ARROW) || keyIsDown(87)) {
-    isMoving = true; // Set to true if any movement key is pressed
-    // Movement logic...
+function handleInput() {
+  isMoving = false; //not moving initially
+
+  if (spaceShip.fuel > 0) { // Check if there's fuel
+    if (keyIsDown(LEFT_ARROW) || keyIsDown(65) || keyIsDown(RIGHT_ARROW) || keyIsDown(68) || keyIsDown(UP_ARROW) || keyIsDown(87)) {
+      isMoving = true; // Set to true if any movement key is pressed
+      spaceShip.fuel -= 0.1; // Consume fuel, adjust rate as needed
+    }
   }
 
-  // Apply movement and rotation based on isMoving
+  // Apply movement and rotation based on isMoving and remaining fuel
   if (isMoving) {
     if (keyIsDown(LEFT_ARROW) || keyIsDown(65)) {
       spaceShip.angularAcc = -spaceShip.baseAngularAcceleration;
@@ -230,8 +259,56 @@ function handleInput() {
     if (keyIsDown(UP_ARROW) || keyIsDown(87)) {
       spaceShip.accelerationMagnitude = spaceShip.baseAcceleration;
     }
+  } else {
+    // Stop acceleration and angular acceleration when not moving or out of fuel
+    spaceShip.accelerationMagnitude = 0;
+    spaceShip.angularAcc = 0;
   }
 }
+
+
+function drawFuelBar() {
+  let fuelBarWidth = 100; // Width of the fuel bar
+  let fuelBarHeight = 20; // Height of the fuel bar
+  let xPosition = 90; // X position of the fuel bar
+  let yPosition = 50; // Y position of the fuel bar
+  let iconSize = 60; // Size of the fuel icon
+  let outlineThickness = 4; // Thickness of the fuel bar outline
+
+  // Draw the fuel icon to the left of the fuel bar
+  image(fuelIconImage, xPosition - iconSize - 10, yPosition - (iconSize - fuelBarHeight) / 2, iconSize, iconSize);
+
+  // Grey outline
+  fill('#808080'); // Grey color for the outline
+  noStroke();
+  rect(xPosition - outlineThickness, yPosition - outlineThickness, fuelBarWidth + outlineThickness * 2, fuelBarHeight + outlineThickness * 2);
+
+  // Pastel red background
+   fill('#FF6A6A');
+  rect(xPosition, yPosition, fuelBarWidth, fuelBarHeight);
+
+  // Calculate remaining fuel width
+  let fuelWidth = fuelBarWidth * (spaceShip.fuel / spaceShip.maxFuel);
+
+  // Bright green for the current fuel level
+  fill('#00FF00');
+  rect(xPosition, yPosition, fuelWidth, fuelBarHeight);
+
+  // White shimmer reflection on the green part
+  let shimmerWidth = fuelWidth * 0.1; // Width of the shimmer to be 10% of the fuel width
+  let shimmerXPosition = xPosition + (fuelWidth * 0.5) - (shimmerWidth * 0.5); // Positioned in the middle of the green part
+  fill(255, 255, 255, 130); // White with some transparency for the shimmer
+  noStroke();
+  rect(shimmerXPosition, yPosition, shimmerWidth, fuelBarHeight);
+
+  //vertical black lines
+  stroke(0); // Black color for the lines
+  strokeWeight(1);
+  for (let i = xPosition; i < xPosition + fuelWidth; i += 10) { // Use your lineSpacing variable if needed
+    line(i, yPosition, i, yPosition + fuelBarHeight);
+  }
+}
+
 
 function updatePosition() {
   // Update linear acceleration based on current angle
@@ -272,34 +349,6 @@ function drawSolarSystem() {
   });
 }
 
-//function drawSpaceShip() {
-//  push();
-//  // Adjust for camera movement
-//  translate(spaceShip.positionX - camX, spaceShip.positionY - camY);
-//  rotate(spaceShip.angle);
-//  fill(255, 0, 0); // Red spaceship
-//  triangle(-10, 20, 10, 20, 0, -20); // Drawing the spaceship
-//  pop();
-//}
-
-//function drawSpaceShip() {
-//  push(); // Start a new drawing state
-//  translate(spaceShip.positionX - camX, spaceShip.positionY - camY); // Adjust for camera movement
-//
-//  // Optional: Adjust the angle of the spaceship image if necessary
-//  // Note: This rotation assumes the spaceship image is facing right by default.
-//  // If your image has a different orientation, you might need to adjust the rotation.
-//  //rotate(radians(spaceShip.angle - 90)); // The -90 adjustment aligns 0 degrees to the right
-//  rotate(spaceShip.angle);
-// // Calculate the desired width and height for scaling
-//  let scaledWidth = spaceShipImage.width * 3; // Scale width by 1.5 times, for example
-//  let scaledHeight = spaceShipImage.height * 3; // Scale height by 1.5 times
-//
-//  // Draw the spaceship image centered and scaled
-//  image(spaceShipImage, -scaledWidth / 2, -scaledHeight / 2, scaledWidth, scaledHeight);
-//
-//  pop(); // Restore original drawing state
-//}
 
 let scaleFactor = 3;
 function drawSpaceShip() {
