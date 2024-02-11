@@ -42,9 +42,14 @@ function setupStars() {
   }
 }
 
+//Spaceship creation
+let spaceShipIdleImage; // For the idle state
+let spaceShipMovingImage; // For the moving state
 
 function preload() {
   meteorImage = loadImage('./Meteor.png'); // Load the meteor image
+  spaceShipIdleImage = loadImage('./alien0.png');
+  spaceShipMovingImage = loadImage('./alien.png');
 }
 
 
@@ -183,23 +188,50 @@ function updateGameplay() {
   drawSpaceShip();
 }
 
+//function handleInput() {
+//  // Reset acceleration and angular acceleration each frame to ensure it only applies when keys are pressed
+//  spaceShip.accelerationMagnitude = 0;
+//  spaceShip.angularAcc = 0;
+//
+//  if (keyIsDown(LEFT_ARROW) || keyIsDown(65)) { // Turn left
+//    spaceShip.angularAcc = -spaceShip.baseAngularAcceleration;
+//  }
+//  if (keyIsDown(RIGHT_ARROW) || keyIsDown(68)) { // Turn right
+//    spaceShip.angularAcc = spaceShip.baseAngularAcceleration;
+//  }
+//  if (keyIsDown(UP_ARROW) || keyIsDown(87)) { // Accelerate forward
+//    spaceShip.accelerationMagnitude = spaceShip.baseAcceleration;
+//  }
+//
+//}
+
+let isMoving = false; // Tracks whether the spaceship is moving
+
 function handleInput() {
-  // Reset acceleration and angular acceleration each frame to ensure it only applies when keys are pressed
+  // Reset states
+  isMoving = false;
   spaceShip.accelerationMagnitude = 0;
   spaceShip.angularAcc = 0;
 
-  if (keyIsDown(LEFT_ARROW) || keyIsDown(65)) { // Turn left
-    spaceShip.angularAcc = -spaceShip.baseAngularAcceleration;
-  }
-  if (keyIsDown(RIGHT_ARROW) || keyIsDown(68)) { // Turn right
-    spaceShip.angularAcc = spaceShip.baseAngularAcceleration;
-  }
-  if (keyIsDown(UP_ARROW) || keyIsDown(87)) { // Accelerate forward
-    spaceShip.accelerationMagnitude = spaceShip.baseAcceleration;
+  // Check for movement keys
+  if (keyIsDown(LEFT_ARROW) || keyIsDown(65) || keyIsDown(RIGHT_ARROW) || keyIsDown(68) || keyIsDown(UP_ARROW) || keyIsDown(87)) {
+    isMoving = true; // Set to true if any movement key is pressed
+    // Movement logic...
   }
 
+  // Apply movement and rotation based on isMoving
+  if (isMoving) {
+    if (keyIsDown(LEFT_ARROW) || keyIsDown(65)) {
+      spaceShip.angularAcc = -spaceShip.baseAngularAcceleration;
+    }
+    if (keyIsDown(RIGHT_ARROW) || keyIsDown(68)) {
+      spaceShip.angularAcc = spaceShip.baseAngularAcceleration;
+    }
+    if (keyIsDown(UP_ARROW) || keyIsDown(87)) {
+      spaceShip.accelerationMagnitude = spaceShip.baseAcceleration;
+    }
+  }
 }
-
 
 function updatePosition() {
   // Update linear acceleration based on current angle
@@ -240,16 +272,51 @@ function drawSolarSystem() {
   });
 }
 
+//function drawSpaceShip() {
+//  push();
+//  // Adjust for camera movement
+//  translate(spaceShip.positionX - camX, spaceShip.positionY - camY);
+//  rotate(spaceShip.angle);
+//  fill(255, 0, 0); // Red spaceship
+//  triangle(-10, 20, 10, 20, 0, -20); // Drawing the spaceship
+//  pop();
+//}
+
+//function drawSpaceShip() {
+//  push(); // Start a new drawing state
+//  translate(spaceShip.positionX - camX, spaceShip.positionY - camY); // Adjust for camera movement
+//
+//  // Optional: Adjust the angle of the spaceship image if necessary
+//  // Note: This rotation assumes the spaceship image is facing right by default.
+//  // If your image has a different orientation, you might need to adjust the rotation.
+//  //rotate(radians(spaceShip.angle - 90)); // The -90 adjustment aligns 0 degrees to the right
+//  rotate(spaceShip.angle);
+// // Calculate the desired width and height for scaling
+//  let scaledWidth = spaceShipImage.width * 3; // Scale width by 1.5 times, for example
+//  let scaledHeight = spaceShipImage.height * 3; // Scale height by 1.5 times
+//
+//  // Draw the spaceship image centered and scaled
+//  image(spaceShipImage, -scaledWidth / 2, -scaledHeight / 2, scaledWidth, scaledHeight);
+//
+//  pop(); // Restore original drawing state
+//}
+
+let scaleFactor = 3;
 function drawSpaceShip() {
   push();
-  // Adjust for camera movement
   translate(spaceShip.positionX - camX, spaceShip.positionY - camY);
+  //rotate(radians(spaceShip.angle));
   rotate(spaceShip.angle);
-  fill(255, 0, 0); // Red spaceship
-  triangle(-10, 20, 10, 20, 0, -20); // Drawing the spaceship
+  // Decide which image to draw based on whether the spaceship is moving
+  let shipImage = isMoving ? spaceShipMovingImage : spaceShipIdleImage;
+
+  // Assuming you want to scale the image, replace with desired scaling
+  let scaledWidth = shipImage.width * scaleFactor;
+  let scaledHeight = shipImage.height * scaleFactor;
+  image(shipImage, -scaledWidth / 2, -scaledHeight / 2, scaledWidth, scaledHeight);
+
   pop();
 }
-
 function calculateDistance(x1, y1, x2, y2) {
   const deltaX = x2 - x1;
   const deltaY = y2 - y1;
