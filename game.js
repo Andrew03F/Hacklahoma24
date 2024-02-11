@@ -501,7 +501,7 @@ function drawTrace() {
   trace.push([spaceShip.positionX , spaceShip.positionY , 1]);
   
   for(let i = 0; i < trace.length - 1; i++) {
-    trace[i][2] += .3;
+    trace[i][2] += .1;
     if (trace[i][2] > 255) {
       trace.splice(i, 1);
     }
@@ -513,7 +513,6 @@ function drawTrace() {
     fill(255, 255, 255, 255 - point[2]);
     ellipse(point[0]- camX, point[1] - camY, 5);
   })
-  console.log(trace);
 };
 
 
@@ -537,7 +536,7 @@ function updatePosition() {
 
   // Update angular velocity and apply damping
   spaceShip.angularVel += spaceShip.angularAcc;
-  spaceShip.angularVel *= .9;
+  spaceShip.angularVel *= .95;
   spaceShip.angle += spaceShip.angularVel;
 }
 
@@ -691,7 +690,7 @@ function getAccDueToGravity() {
     // acceleration in x direction
     let distanceToBody  = calculateDistance(body[1], body[2], spaceShip.positionX, spaceShip.positionY);
     let bodyMass = calculateMass(body[3], planetDensity)
-    if (distanceToBody > 20 && distanceToBody < 700) {
+    if (distanceToBody > 20 && ((distanceToBody < body[3] * 5) || distanceToBody < 800)) {
       accDueToGravity[0] +=  bodyMass * gravityConstant * (body[1] - spaceShip.positionX) 
                             / Math.pow(distanceToBody, 3);
       accDueToGravity[1] +=   bodyMass * gravityConstant *  - (body[2] - spaceShip.positionY) 
