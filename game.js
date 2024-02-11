@@ -128,7 +128,6 @@ function drawStars() {
 
 function drawStartScreen() {
   background(20);
-  drawStarfield();
 
   // Update and draw meteors
   updateAndDrawMeteors();
@@ -176,6 +175,7 @@ function mousePressed() {
 
 function updateGameplay() {
   background(20);
+  drawStarfield();
   handleInput();
   updatePosition();
   updateCamera();
