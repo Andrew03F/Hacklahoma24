@@ -110,6 +110,8 @@ function draw() {
     drawFuelEndGameScreen();
   }else if (gameState === "outOfBounds") {
     drawLostEndGameScreen();
+  }else if (gameState === "collisionEnd") {
+    drawCollisionEndGameScreen();
   }
 
   //image(meteorImage, 0, 0)
@@ -228,6 +230,16 @@ function keyPressed() {
     spaceShip.angle = 180; // Reset orientation if needed
     spaceShip.fuel = spaceShip.maxFuel; // Refill fuel
   }
+  else if (gameState === "collisionEnd" && keyCode === ENTER) {
+    gameState = "startScreen"; // Change back to start screen
+    // Reset spaceship properties
+    spaceShip.positionX = 1150; // Reset to starting position near Earth
+    spaceShip.positionY = 350;
+    spaceShip.speed.dx = 0; // Reset any movement speed
+    spaceShip.speed.dy = 0;
+    spaceShip.angle = 180; // Reset orientation if needed
+    spaceShip.fuel = spaceShip.maxFuel; // Refill fuel
+  }
   return false; // Prevent default behavior
 }
 
@@ -281,6 +293,28 @@ function drawLostEndGameScreen() {
   }
 }
 
+function drawCollisionEndGameScreen() {
+  drawStarfield(); // Draw the star background first
+ 
+   textSize(40); // Set the text size
+   textAlign(CENTER, CENTER); // Align text to be centered
+ 
+   // Blinking effect for "Game Over" text
+   if (frameCount % 60 < 30) {
+     // Yellow shadow
+     fill(255, 255, 0); // Set the shadow color to yellow
+     text("YOU COLLIDED WITH A CELESTIAL BODY", width / 2 + 5, height / 2 + 5); // Offset the shadow slightly
+ 
+     // Primary text color
+     fill(255, 0, 0); // Set the primary text color to red
+     text("YOU COLLIDED WITH A CELESTIAL BODY", width / 2, height / 2); // Draw the primary text on top
+ 
+     textSize(22);
+     text("insert (1) coin", width / 2 + 2, height - 50);
+   }
+ }
+ 
+
 function updateGameplay() {
 
     if (spaceShip.positionX < -5000 || spaceShip.positionX > 5000 || spaceShip.positionY < -5000 || spaceShip.positionY > 5000) {
@@ -296,6 +330,12 @@ function updateGameplay() {
     drawFuelEndGameScreen(); // Draw the end game screen immediately
     return; // Skip drawing the rest of the gameplay elements
   }
+
+  if (checkCollision()) {
+    gameState = "collisionEnd";
+    return; // Stop further drawing or updates since the game is over
+  }
+
 
   background(20);
   drawStarfield();
@@ -433,6 +473,24 @@ function drawSolarSystem() {
     }
   });
 }
+
+function checkCollision() {
+  for (let i = 0; i < solarSystem.length; i++) {
+    let body = solarSystem[i];
+    // Skip Earth in the collision check
+    if (body[0] === "Earth") continue;
+
+    let distance = calculateDistance(spaceShip.positionX, spaceShip.positionY, body[1], body[2]);
+
+    // Assuming the spaceship's effective "radius" for collision is 20 (adjust based on your spaceship size)
+    let collisionDistance = body[3] / 2 + 20; // body[3] is the diameter, so /2 gives the radius
+    if (distance < collisionDistance) {
+      return true; // Collision detected
+    }
+  }
+  return false; // No collision
+}
+
 
 let scaleFactor = 0.7;
 let flickerState = false; // Track the flicker state
