@@ -15,14 +15,13 @@ let spaceShip = {
 };
 
 let planetDensity = 2;
-let gravityConstant = .00001;
+let gravityConstant = .00003;
 // Adjusted solar system with larger planet sizes
 let solarSystem = [
-  ["BlackHole", 1500, -1000, 400, 'yellow'], // Increased size for visibility
-  // ["Mercury", 250, 350, 25, 'darkgrey'], // Larger than before, but still the smallest planet
-  // ["Venus", 400, 350, 50, 'orange'], // Increased size, closer to Earth
+  ["BlackHole", 0, -3500, 400, 'yellow'], // Increased size for visibility
+  ["Saturn", 3750, -3000, 220, 'orange'], // Increased size, closer to Earth
   ["Earth", 1000, 350, 200, 'blue'], // Significantly larger
-  ["Moon", 1400, 700, 48, 'blue'], // Larger, maintaining relative size to Earth
+  ["Moon", -500, -5200, 130, 'blue'], // Larger, maintaining relative size to Earth
   ["Mars", 3000, -350, 200, 'orange'] 
 ];
 
@@ -51,6 +50,7 @@ let spaceShipFlickerMovingImage;
 let moonImage;
 let blackHoleImage;
 let redPlanetImage;
+let saturnImage;
 
 let spaceShipFlickerImage1; // For the flicker effect
 let spaceShipFlickerImage2; // For the flicker effect
@@ -79,8 +79,9 @@ function preload() {
   spaceShipImage5 = loadImage('./assets/ship5.png');
   earthImage = loadImage('./earth.png');
   moonImage = loadImage('./moon.png');
-  redPlanetImage = loadImage('./assets/redPlanet.png')
-  blackHoleImage = loadImage('./blackHole.png')
+  redPlanetImage = loadImage('./assets/redPlanet.png');
+  blackHoleImage = loadImage('./blackHole.png');
+  saturnImage = loadImage('./assets/sphereplanet.png');
 
   font = loadFont('./assets/power-clear.ttf');
   fuelIconImage = loadImage('./Fuel.png');
@@ -355,7 +356,7 @@ function drawCollisionEndGameScreen() {
 
 function updateGameplay() {
 
-  if (spaceShip.positionX < -5000 || spaceShip.positionX > 5000 || spaceShip.positionY < -5000 || spaceShip.positionY > 5000) {
+    if (spaceShip.positionX < -5000 || spaceShip.positionX > 5000 || spaceShip.positionY < -8000 || spaceShip.positionY > 2000) {
     gameState = "outOfBounds"; // Change to out-of-bounds state
     drawLostEndGameScreen();
     return;
@@ -384,6 +385,7 @@ function updateGameplay() {
   drawSolarSystem();
   drawSpaceShip();
   drawFuelBar();
+  drawMiniMap();
 }
 
 function drawMissionText() {
@@ -503,7 +505,7 @@ function updatePosition() {
 function updateCamera() {
   // Constrain camera movement within a broad range for exploration
   camX = constrain(spaceShip.positionX - width / 2, -5000, 5000);
-  camY = constrain(spaceShip.positionY - height / 2, -5000, 5000);
+  camY = constrain(spaceShip.positionY - height / 2, -8000, 2000);
 }
 
 function drawSolarSystem() {
@@ -522,6 +524,9 @@ function drawSolarSystem() {
     }
     if (body[0] === 'Mars') {
       image(redPlanetImage, body[1] - camX - body[3] / 2, body[2] - camY - body[3]/ 2 );
+    }
+    if (body[0] === 'Saturn') {
+      image(saturnImage, body[1] - camX - 240, body[2] - camY - body[3]/ 2 );
     }
   });
 }
@@ -603,6 +608,33 @@ function drawSpaceShip() {
   pop();
 }
 
+function drawMiniMap() {
+  fill(255, 255, 255, 100);
+  // scale is 1 to 50
+  let scale = .02;
+  let miniMapH = 140;
+  let miniMapW = 120;
+
+  let left = 1024 - 10 - miniMapW;
+  let top = 569 - 10 - miniMapH;
+  rect(left, top, miniMapW, miniMapH);
+  
+  fill(0,0,0)
+  solarSystem.forEach( (body) => {
+    ellipse(left + scale * (1000 + body[1]), top + scale * (6000 + body[2]), scale * body[3])
+  });
+  push()
+  translate(left + scale * (1000 + spaceShip.positionX),  top + scale * (6000 + spaceShip.positionY));
+  rotate(spaceShip.angle); // Rotate by the calculated angle plus 90 degrees (to point in the direction of movement)
+  fill(0, 255, 0);
+  beginShape();
+  vertex(0, -10);
+  vertex(-5, 5);
+  vertex(5, 5);
+  endShape(CLOSE);
+  pop(); 
+}
+
 
 function calculateDistance(x1, y1, x2, y2) {
   const deltaX = x2 - x1;
@@ -621,9 +653,9 @@ function getAccDueToGravity() {
     let distanceToBody  = calculateDistance(body[1], body[2], spaceShip.positionX, spaceShip.positionY);
     let bodyMass = calculateMass(body[3], planetDensity)
     if (body[0] === 'BlackHole') {
-      bodyMass *= 4;
+      bodyMass *= 2;
     }
-    if (distanceToBody > 30) {
+    if (distanceToBody > 20) {
       accDueToGravity[0] +=  bodyMass * gravityConstant * (body[1] - spaceShip.positionX) 
                             / Math.pow(distanceToBody, 3);
       accDueToGravity[1] +=   bodyMass * gravityConstant *  - (body[2] - spaceShip.positionY) 
@@ -657,7 +689,7 @@ class Star {
     constructor() {
         let starCoverage = 10000;
         this.x = random(starCoverage) - starCoverage / 2;
-        this.y = random(starCoverage) - starCoverage / 2;
+        this.y = random(starCoverage) - 4 * starCoverage / 5 ;
         this.size = random(1,4);
         if (this.size >=2) {
             this.size = random(1,4);
