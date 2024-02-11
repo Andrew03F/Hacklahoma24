@@ -41,6 +41,7 @@ function setupStars() {
       size: random(1, 3), // Randomize star size for variety
       brightness: random(150, 255) // Optional: Random brightness for a twinkling effect
     });
+    // comment for commit 
   }
 }
 
