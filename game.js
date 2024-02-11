@@ -1,28 +1,29 @@
 //SPACESHIP Creation
 let spaceShip = {
-  positionX: 1150, // Start near Earth
+  positionX: 1220, // Start near Earth
   positionY: 350,
   accelerationMagnitude: 0,
   acceleration: { ax: 0, ay: 0 },
-  speed: { dx: 0, dy: -2 },
+  speed: { dx: 0, dy: -2.45 },
   angle: 180,
   angularAcc: 0,
   angularVel: 0,
-  baseAcceleration: .1,
+  baseAcceleration: .03,
   baseAngularAcceleration: .2,
   fuel: 100, // Starting fuel level
   maxFuel: 100, // Maximum fuel capacity
 };
 
 let planetDensity = 2;
-let gravityConstant = .00003;
+let gravityConstant = .00002;
 // Adjusted solar system with larger planet sizes
 let solarSystem = [
   ["BlackHole", 0, -3500, 400, 'yellow'], // Increased size for visibility
   ["Saturn", 3750, -3000, 220, 'orange'], // Increased size, closer to Earth
   ["Earth", 1000, 350, 200, 'blue'], // Significantly larger
   ["Moon", -500, -5200, 130, 'blue'], // Larger, maintaining relative size to Earth
-  ["Mars", 3000, -350, 200, 'orange'] 
+  ["Mars", 3000, -900, 200, 'orange'] ,
+  ["Venus", -1000, 900, 300, 'orange'] 
 ];
 
 //METEORS Creation
@@ -98,6 +99,10 @@ let camY = 0;
 let gameState = "startScreen"; // Added game state
 
 let stars = [];
+
+let trace = []
+let traceFreq = 4;
+let traceCounter = 0;
 
 function setup() {
   createCanvas(1024, 569, document.getElementById("game"));
@@ -254,7 +259,7 @@ function keyPressed() {
     spaceShip.positionX = 1150; // Reset to starting position near Earth
     spaceShip.positionY = 350;
     spaceShip.speed.dx = 0; // Reset any movement speed
-    spaceShip.speed.dy = 0;
+    spaceShip.speed.dy = -2;
     spaceShip.angle = 180; // Reset orientation if needed
     spaceShip.fuel = spaceShip.maxFuel; // Refill fuel
   }else if (gameState === "outOfBounds" && keyCode === ENTER) {
@@ -383,9 +388,11 @@ function updateGameplay() {
   updatePosition();
   updateCamera();
   drawSolarSystem();
+  drawTrace();
   drawSpaceShip();
   drawFuelBar();
   drawMiniMap();
+  
 }
 
 function drawMissionText() {
@@ -397,7 +404,7 @@ function drawMissionText() {
       fill('red'); // White color for the text
       textSize(32);
       textAlign(LEFT, TOP);
-      text("Mission: Find Mars", xPosition, yPosition);
+      text("Mission: Find The Moon", xPosition, yPosition);
 
 
      }
@@ -477,6 +484,27 @@ function drawFuelBar() {
   }
 }
 
+function drawTrace() {
+  
+  
+  trace.push([spaceShip.positionX , spaceShip.positionY , 1]);
+  
+  for(let i = 0; i < trace.length - 1; i++) {
+    trace[i][2] += .3;
+    if (trace[i][2] > 255) {
+      trace.splice(i, 1);
+    }
+    fill(255, 255, 255);
+    ellipse(point[0]- camX, point[1] - camY, 5);
+    
+  }
+  trace.forEach( (point) => {
+    fill(255, 255, 255, 255 - point[2]);
+    ellipse(point[0]- camX, point[1] - camY, 5);
+  })
+  console.log(trace);
+};
+
 
 function updatePosition() {
   // Update linear acceleration based on current angle
@@ -539,13 +567,13 @@ function checkCollision() {
     let body = solarSystem[i];
 
     // Skip Earth in the collision check
-    if (body[0] === "Earth") continue;
+    //if (body[0] === "Earth") continue;
 
     let distance = calculateDistance(spaceShip.positionX, spaceShip.positionY, body[1], body[2]);
     let collisionDistance = body[3] / 2 + 20; // Assuming the spaceship's effective "radius" for collision
 
     // Special case for Mars: check speed if touching Mars
-    if (body[0] === "Mars" && distance < collisionDistance) {
+    if (body[0] === "Moon" && distance < collisionDistance) {
       if (speedMagnitude < 5) { // Adjust the speed threshold as needed
         gameState = "win"; // Change game state to win if speed is low enough
         return false; // No collision in terms of ending the game
@@ -565,7 +593,7 @@ function drawWinScreen() {
   textSize(40); // Set the text size
   textAlign(CENTER, CENTER); // Align text to be centered
   fill(255, 215, 0); // Gold color for the win message
-  text("CONGRATULATIONS, YOU'VE LANDED ON MARS!", width / 2, height / 2);
+  text("CONGRATULATIONS, YOU'VE LANDED ON THE MOON!", width / 2, height / 2);
 
   textSize(22); // Smaller text for the restart instruction
   text("Press ENTER to restart", width / 2, height / 2 + 50);
@@ -652,10 +680,7 @@ function getAccDueToGravity() {
     // acceleration in x direction
     let distanceToBody  = calculateDistance(body[1], body[2], spaceShip.positionX, spaceShip.positionY);
     let bodyMass = calculateMass(body[3], planetDensity)
-    if (body[0] === 'BlackHole') {
-      bodyMass *= 2;
-    }
-    if (distanceToBody > 20) {
+    if (distanceToBody > 20 && distanceToBody < 700) {
       accDueToGravity[0] +=  bodyMass * gravityConstant * (body[1] - spaceShip.positionX) 
                             / Math.pow(distanceToBody, 3);
       accDueToGravity[1] +=   bodyMass * gravityConstant *  - (body[2] - spaceShip.positionY) 
