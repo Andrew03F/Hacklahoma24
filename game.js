@@ -9,7 +9,7 @@ let spaceShip = {
   angularAcc: 0,
   angularVel: 0,
   baseAcceleration: .1,
-  baseAngularAcceleration: 1,
+  baseAngularAcceleration: .5,
   fuel: 100, // Starting fuel level
   maxFuel: 100, // Maximum fuel capacity
 };
@@ -47,9 +47,14 @@ function setupStars() {
 //Spaceship creation
 let spaceShipIdleImage; // For the idle state
 let spaceShipMovingImage; // For the moving state
+let spaceShipFlickerMovingImage;
 let moonImage;
 let blackHoleImage;
 
+let spaceShipFlickerImage1; // For the flicker effect
+let spaceShipFlickerImage2; // For the flicker effect
+let spaceShipImage4;
+let spaceShipImage5;
 let font;
 
 //Fuel icon creation
@@ -58,8 +63,12 @@ let fuelBarImage;
 
 function preload() {
   meteorImage = loadImage('./Meteor.png'); // Load the meteor image
-  spaceShipIdleImage = loadImage('./alien0.png');
-  spaceShipMovingImage = loadImage('./alien.png');
+  spaceShipIdleImage = loadImage('./assets/ship1.png');
+  spaceShipMovingImage = loadImage('./assets/ship2.png');
+  spaceShipFlickerImage1 = loadImage('./assets/ship2.png'); // Replace with the correct path if necessary
+  spaceShipFlickerImage2 = loadImage('./assets/ship3.png'); // Replace with the correct path if necessary
+  spaceShipImage4 = loadImage('./assets/ship4.png');
+  spaceShipImage5 = loadImage('./assets/ship5.png');
   earthImage = loadImage('./earth.png');
   moonImage = loadImage('./moon.png');
   blackHoleImage = loadImage('./blackHole.png')
@@ -227,6 +236,9 @@ function drawFuelEndGameScreen() {
     // Primary text color
     fill(255, 0, 0); // Set the primary text color to red
     text("YOU RAN OUT OF FUEL", width / 2, height / 2); // Draw the primary text on top
+
+    textSize(22);
+    text("insert (1) coin", width / 2 + 2, height - 50);
   }
 }
 
@@ -375,23 +387,60 @@ function drawSolarSystem() {
   });
 }
 
+let scaleFactor = 0.7;
+let flickerState = false; // Track the flicker state
+let lastFlickerTime = 0; // Track the last time the image was toggled
 
-let scaleFactor = 3;
 function drawSpaceShip() {
   push();
   translate(spaceShip.positionX - camX, spaceShip.positionY - camY);
-  //rotate(radians(spaceShip.angle));
   rotate(spaceShip.angle);
-  // Decide which image to draw based on whether the spaceship is moving
-  let shipImage = isMoving ? spaceShipMovingImage : spaceShipIdleImage;
 
-  // Assuming you want to scale the image, replace with desired scaling
+  let shipImage;
+  // Check if the W key or up arrow key is pressed and if there's movement
+  if (isMoving && (keyIsDown(UP_ARROW) || keyIsDown(87))) {
+    // Implement a simple timing mechanism for flicker effect
+    if (millis() - lastFlickerTime > 100) { // Change the flicker speed by adjusting the time here
+      flickerState = !flickerState;
+      lastFlickerTime = millis();
+    }
+    shipImage = flickerState ? spaceShipFlickerImage1 : spaceShipFlickerImage2;
+  } else if (keyIsDown(RIGHT_ARROW) || keyIsDown(68)) {
+    // Show ship4.png when D key or right arrow key is pressed
+    shipImage = spaceShipImage4;
+  } else if (keyIsDown(LEFT_ARROW) || keyIsDown(65)) {
+    // Show ship5.png when A key or left arrow key is pressed
+    shipImage = spaceShipImage5;
+  }else {
+    shipImage = spaceShipIdleImage;
+  }
+
+  // Scale the image
   let scaledWidth = shipImage.width * scaleFactor;
   let scaledHeight = shipImage.height * scaleFactor;
   image(shipImage, -scaledWidth / 2, -scaledHeight / 2, scaledWidth, scaledHeight);
 
   pop();
 }
+
+//let scaleFactor = 0.7;
+//function drawSpaceShip() {
+//  push();
+//  translate(spaceShip.positionX - camX, spaceShip.positionY - camY);
+//  //rotate(radians(spaceShip.angle));
+//  rotate(spaceShip.angle);
+//  // Decide which image to draw based on whether the spaceship is moving
+//  let shipImage = isMoving ? spaceShipMovingImage : spaceShipIdleImage;
+//
+//  // Assuming you want to scale the image, replace with desired scaling
+//  let scaledWidth = shipImage.width * scaleFactor;
+//  let scaledHeight = shipImage.height * scaleFactor;
+//  image(shipImage, -scaledWidth / 2, -scaledHeight / 2, scaledWidth, scaledHeight);
+//
+//  pop();
+//}
+
+
 function calculateDistance(x1, y1, x2, y2) {
   const deltaX = x2 - x1;
   const deltaY = y2 - y1;
