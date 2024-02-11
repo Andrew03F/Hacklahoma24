@@ -16,11 +16,11 @@ let planetDensity = 2;
 let gravityConstant = .00001;
 // Adjusted solar system with larger planet sizes
 let solarSystem = [
-  // ["Sun", -500, 350, 300, 'yellow'], // Increased size for visibility
+  ["BlackHole", 1500, -1000, 400, 'yellow'], // Increased size for visibility
   // ["Mercury", 250, 350, 25, 'darkgrey'], // Larger than before, but still the smallest planet
   // ["Venus", 400, 350, 50, 'orange'], // Increased size, closer to Earth
   ["Earth", 1000, 350, 200, 'blue'], // Significantly larger
-  // ["Mars", 1300, 350, 35, 'red'], // Larger, maintaining relative size to Earth
+  ["Moon", 1400, 700, 48, 'blue'], // Larger, maintaining relative size to Earth
   // ["Jupiter", 1900, 350, 280, 'orange'] // Much larger, reflecting its status as the largest planet
 ];
 
@@ -45,11 +45,16 @@ function setupStars() {
 //Spaceship creation
 let spaceShipIdleImage; // For the idle state
 let spaceShipMovingImage; // For the moving state
+let moonImage;
+let blackHoleImage;
 
 function preload() {
   meteorImage = loadImage('./Meteor.png'); // Load the meteor image
   spaceShipIdleImage = loadImage('./alien0.png');
   spaceShipMovingImage = loadImage('./alien.png');
+  earthImage = loadImage('./earth.png');
+  moonImage = loadImage('./moon.png');
+  blackHoleImage = loadImage('./blackHole.png')
 }
 
 
@@ -269,6 +274,15 @@ function drawSolarSystem() {
   solarSystem.forEach(body => {
     fill(body[4]);
     ellipse(body[1] - camX, body[2] - camY, body[3], body[3]);
+    if (body[0] === 'Earth') {
+      image(earthImage, body[1] - camX - body[3]/ 2, body[2] - camY - body[3]/ 2);
+    }
+    if (body[0] === 'Moon') {
+      image(moonImage, body[1] - camX - body[3]/ 2, body[2] - camY - body[3]/ 2);
+    }
+    if (body[0] === 'BlackHole') {
+      image(blackHoleImage, body[1] - camX - 421, body[2] - camY - body[3]/ 2 - 30);
+    }
   });
 }
 
@@ -332,10 +346,14 @@ function getAccDueToGravity() {
   solarSystem.forEach(body => {
     // acceleration in x direction
     let distanceToBody  = calculateDistance(body[1], body[2], spaceShip.positionX, spaceShip.positionY);
+    let bodyMass = calculateMass(body[3], planetDensity)
+    if (body[0] === 'BlackHole') {
+      bodyMass *= 4;
+    }
     if (distanceToBody > 30) {
-      accDueToGravity[0] +=  calculateMass(body[3], planetDensity) * gravityConstant * (body[1] - spaceShip.positionX) 
+      accDueToGravity[0] +=  bodyMass * gravityConstant * (body[1] - spaceShip.positionX) 
                             / Math.pow(distanceToBody, 3);
-      accDueToGravity[1] +=  calculateMass(body[3], planetDensity) * gravityConstant *  - (body[2] - spaceShip.positionY) 
+      accDueToGravity[1] +=   bodyMass * gravityConstant *  - (body[2] - spaceShip.positionY) 
                             / Math.pow(distanceToBody, 3);
     }
   });
@@ -349,7 +367,7 @@ function calculateMass(radius, density) {
   
   // Calculate mass by multiplying volume by density
   const mass = volume * density;
-  
+
   return mass;
 }
 function drawStarfield() {
