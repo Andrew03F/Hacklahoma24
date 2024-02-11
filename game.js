@@ -154,7 +154,7 @@ function updateAndDrawMeteors() {
   });
 
   // Periodically add new meteors
-  if (frameCount % 15 === 0) {
+  if (frameCount % 20 === 0) {
     createMeteor();
   }
 }
@@ -193,22 +193,17 @@ function drawTitleText() {
   text("LUNA NEW YEAR", width / 2, height / 2 - 50); // Keep the title in its original position
   text("LUNA NEW YEAR", width / 2 + 2, height / 2 - 50 + 2);
     
+  fill(107, 45, 95); // Bright red for a classic retro arcade look
+  textSize(32); // Size for "Start Game" text
+  text("Press Enter to Start", width / 2, height - 250); // Position it 100 pixels above the bottom
+    
   fill(78, 81, 128);
   textSize(22);
   text("W = THRUST, A = L-BOOST, D = R-BOOST", width /6, height - 30);
 
   // Blinking effect for "Start Game" text
-  if (frameCount % 60 < 30) { // Toggle visibility every 30 frames for blinking effect
-    // "Start Game" text moved towards the bottom
-    fill(255, 0, 0); // Bright red for a classic retro arcade look
-    textSize(32); // Size for "Start Game" text
-    text("Start Game", width / 2, height - 250); // Position it 100 pixels above the bottom
-
-    // Adding glow effect while maintaining the blink
-    fill(255, 255, 0); // Strobe color for shadow/glow
-    textSize(33); // Slightly larger size for a glow effect
-    text("Start Game", width / 2 + 2, height - 250 + 2); // Offset position for shadow/glow
-      
+  if (frameCount % 60 < 30) { // Toggle visibility every 30 frames for blinking effect   
+    fill(255, 255, 0);
     textSize(22);
     text("insert (1) coin", width / 2 + 2, height - 50);
     
@@ -279,14 +274,13 @@ function drawFuelEndGameScreen() {
 
   // Blinking effect for "Game Over" text
   if (frameCount % 60 < 30) {
-    // Yellow shadow
-    fill(255, 255, 0); // Set the shadow color to yellow
-    text("YOU RAN OUT OF FUEL", width / 2 + 5, height / 2 + 5); // Offset the shadow slightly
+    fill(255, 87, 51); 
+    text("YOU RAN OUT OF FUEL", width / 2 + 2, height / 2 + 2); // Offset the shadow slightly
 
     // Primary text color
-    fill(255, 0, 0); // Set the primary text color to red
-    text("YOU RAN OUT OF FUEL", width / 2, height / 2); // Draw the primary text on top
-
+//    fill(255, 0, 0); // Set the primary text color to red
+//    text("YOU RAN OUT OF FUEL", width / 2, height / 2); // Draw the primary text on top
+    fill(255, 255, 0);
     textSize(22);
     text("insert (1) coin", width / 2 + 2, height - 50);
   }
@@ -300,14 +294,11 @@ function drawLostEndGameScreen() {
 
   // Blinking effect for "Game Over" text
   if (frameCount % 60 < 30) {
-    // Yellow shadow
-    fill(255, 255, 0); // Set the shadow color to yellow
-    text("LOST IN SPACE", width / 2 + 5, height / 2 + 5); // Offset the shadow slightly
-
     // Primary text color
-    fill(255, 0, 0); // Set the primary text color to red
+    fill(255, 87, 51); // Set the primary text color to red
     text("LOST IN SPACE", width / 2, height / 2); // Draw the primary text on top
-
+    
+    fill(255, 255, 0);
     textSize(22);
     text("insert (1) coin", width / 2 + 2, height - 50);
   }
@@ -321,14 +312,12 @@ function drawCollisionEndGameScreen() {
  
    // Blinking effect for "Game Over" text
    if (frameCount % 60 < 30) {
-     // Yellow shadow
-     fill(255, 255, 0); // Set the shadow color to yellow
-     text("YOU COLLIDED WITH A CELESTIAL BODY", width / 2 + 5, height / 2 + 5); // Offset the shadow slightly
  
      // Primary text color
-     fill(255, 0, 0); // Set the primary text color to red
+     fill(255, 87, 51); // Set the primary text color to red
      text("YOU COLLIDED WITH A CELESTIAL BODY", width / 2, height / 2); // Draw the primary text on top
  
+     fill(255, 255, 0);
      textSize(22);
      text("insert (1) coin", width / 2 + 2, height - 50);
    }

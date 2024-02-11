@@ -12,9 +12,13 @@ canvas {
     max-width: 100%;
     object-fit: contain;
     padding: 10%;
-    padding-left: 10%;
-    padding-right: 10%;
     margin-left: auto;
     margin-right: auto;
     display: block;
+}
+
+img {
+  left: 50%;
+  transform: translateX(-50%);
+  position: absolute;
 }
