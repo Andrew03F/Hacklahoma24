@@ -9,7 +9,7 @@ let spaceShip = {
   angularAcc: 0,
   angularVel: 0,
   baseAcceleration: .1,
-  baseAngularAcceleration: .5,
+  baseAngularAcceleration: .2,
   fuel: 100, // Starting fuel level
   maxFuel: 100, // Maximum fuel capacity
 };
@@ -105,6 +105,8 @@ function draw() {
     updateGameplay();
   } else if (gameState === "endGame") {
     drawFuelEndGameScreen();
+  }else if (gameState === "outOfBounds") {
+    drawLostEndGameScreen();
   }
 
   //image(meteorImage, 0, 0)
@@ -204,11 +206,24 @@ function keyPressed() {
   if (gameState === "startScreen" && (key === ' ' || keyCode === ENTER)) {
     gameState = "gameplay";
     spaceShip.fuel = spaceShip.maxFuel; // Reset fuel
-    // You may also want to reset the spaceship position and other properties here
   } else if (gameState === "endGame" && keyCode === ENTER) {
     gameState = "startScreen"; // Change back to start screen
-    spaceShip.fuel = spaceShip.maxFuel; // Reset fuel
-    // Again, reset other necessary properties if needed
+    // Reset spaceship properties
+    spaceShip.positionX = 1150; // Reset to starting position near Earth
+    spaceShip.positionY = 350;
+    spaceShip.speed.dx = 0; // Reset any movement speed
+    spaceShip.speed.dy = 0;
+    spaceShip.angle = 180; // Reset orientation if needed
+    spaceShip.fuel = spaceShip.maxFuel; // Refill fuel
+  }else if (gameState === "outOfBounds" && keyCode === ENTER) {
+    gameState = "startScreen"; // Change back to start screen
+    // Reset spaceship properties
+    spaceShip.positionX = 1150; // Reset to starting position near Earth
+    spaceShip.positionY = 350;
+    spaceShip.speed.dx = 0; // Reset any movement speed
+    spaceShip.speed.dy = 0;
+    spaceShip.angle = 180; // Reset orientation if needed
+    spaceShip.fuel = spaceShip.maxFuel; // Refill fuel
   }
   return false; // Prevent default behavior
 }
@@ -242,9 +257,35 @@ function drawFuelEndGameScreen() {
   }
 }
 
+function drawLostEndGameScreen() {
+ drawStarfield(); // Draw the star background first
 
+  textSize(40); // Set the text size
+  textAlign(CENTER, CENTER); // Align text to be centered
+
+  // Blinking effect for "Game Over" text
+  if (frameCount % 60 < 30) {
+    // Yellow shadow
+    fill(255, 255, 0); // Set the shadow color to yellow
+    text("LOST IN SPACE", width / 2 + 5, height / 2 + 5); // Offset the shadow slightly
+
+    // Primary text color
+    fill(255, 0, 0); // Set the primary text color to red
+    text("LOST IN SPACE", width / 2, height / 2); // Draw the primary text on top
+
+    textSize(22);
+    text("insert (1) coin", width / 2 + 2, height - 50);
+  }
+}
 
 function updateGameplay() {
+
+    if (spaceShip.positionX < -5000 || spaceShip.positionX > 5000 || spaceShip.positionY < -5000 || spaceShip.positionY > 5000) {
+    gameState = "outOfBounds"; // Change to out-of-bounds state
+    drawLostEndGameScreen();
+    return;
+  }
+
 
    if (spaceShip.fuel <= 0) {
     // If the fuel is out, change the game state to "endGame"
@@ -422,23 +463,6 @@ function drawSpaceShip() {
 
   pop();
 }
-
-//let scaleFactor = 0.7;
-//function drawSpaceShip() {
-//  push();
-//  translate(spaceShip.positionX - camX, spaceShip.positionY - camY);
-//  //rotate(radians(spaceShip.angle));
-//  rotate(spaceShip.angle);
-//  // Decide which image to draw based on whether the spaceship is moving
-//  let shipImage = isMoving ? spaceShipMovingImage : spaceShipIdleImage;
-//
-//  // Assuming you want to scale the image, replace with desired scaling
-//  let scaledWidth = shipImage.width * scaleFactor;
-//  let scaledHeight = shipImage.height * scaleFactor;
-//  image(shipImage, -scaledWidth / 2, -scaledHeight / 2, scaledWidth, scaledHeight);
-//
-//  pop();
-//}
 
 
 function calculateDistance(x1, y1, x2, y2) {
