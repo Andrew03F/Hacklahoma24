@@ -29,7 +29,7 @@ let stars = [];
 function setup() {
   createCanvas(1024, 569, document.getElementById("game"));
   
-  for(let i = 0; i < 100; i++) {
+  for(let i = 0; i < 10000; i++) {
       stars.push(new Star());
   }
 
@@ -87,8 +87,8 @@ function updatePosition() {
 
 function updateCamera() {
   // Constrain camera movement within a broad range for exploration
-  camX = constrain(spaceShip.positionX - width / 2, -50000, 50000);
-  camY = constrain(spaceShip.positionY - height / 2, -50000, 50000);
+  camX = constrain(spaceShip.positionX - width / 2, -5000, 5000);
+  camY = constrain(spaceShip.positionY - height / 2, -5000, 5000);
 }
 
 function drawSolarSystem() {
@@ -121,24 +121,28 @@ function drawStarfield() {
 
 class Star {
     constructor() {
-        this.x = random(width);
-        this.y = random(height);
+        let starCoverage = 10000;
+        this.x = random(starCoverage) - starCoverage / 2;
+        this.y = random(starCoverage) - starCoverage / 2;
         this.size = random(1,4);
-        this.speed = random(1,3);
+        if (this.size >=2) {
+            this.size = random(1,4);
+        }
     }
     
     show() {
         noStroke();
         fill(255);
-        ellipse(this.x, this.y, this.size);
+        ellipse(this.x -camX, this.y - camY, this.size);
     }
     
     update() {
-        this.x -= this.speed;
+        this.x += .1 * -spaceShip.speed.dx * this.size;
+        this.y += .1 * spaceShip.speed.dy * this.size;
         
-        if(this.x < -this.size) {
-            this.x = width + this.size;
-            this.y = random(height);
-        }
+       
+    }
+    setSpeed() {
+        this.speed = this.size * spaceShip.speed.dx
     }
 }
