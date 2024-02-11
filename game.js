@@ -64,6 +64,11 @@ let fuelBarImage;
 
 let showMissionText = true;
 
+//sound creation
+let introSound;
+let missionSound;
+let endSound;
+
 function preload() {
   meteorImage = loadImage('./Meteor.png'); // Load the meteor image
   spaceShipIdleImage = loadImage('./assets/ship1.png');
@@ -80,6 +85,10 @@ function preload() {
   font = loadFont('./assets/power-clear.ttf');
   fuelIconImage = loadImage('./Fuel.png');
   fuelBarImage = loadImage('./fuelbar.png');
+
+  introSound = loadSound('./assets/intro.wav');
+  missionSound = loadSound('./assets/mission.wav');
+  endSound = loadSound('./assets/end.wav');
 }
 
 
@@ -106,16 +115,36 @@ function setup() {
 
 function draw() {
   if (gameState === "startScreen") {
+    if (!introSound.isPlaying()) { // Check if the sound is not already playing
+      introSound.play();
+      endSound.pause();
+    }
     drawStartScreen();
   } else if (gameState === "gameplay") {
+     if (!missionSound.isPlaying()) { // Check if the sound is not already playing
+      introSound.pause();
+      missionSound.play();
+    }
     updateGameplay();
     setTimeout(() => {showMissionText = false;}, 15000)
     drawMissionText();
   } else if (gameState === "endGame") {
+     if (!endSound.isPlaying()) { // Check if the sound is not already playing
+      missionSound.pause();
+      endSound.play();
+    }
     drawFuelEndGameScreen();
   }else if (gameState === "outOfBounds") {
+  if (!endSound.isPlaying()) { // Check if the sound is not already playing
+      missionSound.pause();
+      endSound.play();
+    }
     drawLostEndGameScreen();
   }else if (gameState === "collisionEnd") {
+  if (!endSound.isPlaying()) { // Check if the sound is not already playing
+      missionSound.pause();
+      endSound.play();
+    }
     drawCollisionEndGameScreen();
   }else if (gameState === "win") {
     drawWinScreen(); // Draw the win screen when in win state
