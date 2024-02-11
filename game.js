@@ -62,6 +62,8 @@ let font;
 let fuelIconImage;
 let fuelBarImage;
 
+let showMissionText = true;
+
 function preload() {
   meteorImage = loadImage('./Meteor.png'); // Load the meteor image
   spaceShipIdleImage = loadImage('./assets/ship1.png');
@@ -99,6 +101,7 @@ function setup() {
   setupStars();
   camX = spaceShip.positionX - width / 2; // Center horizontally on the spaceship at start
   camY = spaceShip.positionY - height / 2; // Center vertically on the spaceship at start
+
 }
 
 function draw() {
@@ -106,13 +109,18 @@ function draw() {
     drawStartScreen();
   } else if (gameState === "gameplay") {
     updateGameplay();
+    setTimeout(() => {showMissionText = false;}, 15000)
+    drawMissionText();
   } else if (gameState === "endGame") {
     drawFuelEndGameScreen();
   }else if (gameState === "outOfBounds") {
     drawLostEndGameScreen();
   }else if (gameState === "collisionEnd") {
     drawCollisionEndGameScreen();
+  }else if (gameState === "win") {
+    drawWinScreen(); // Draw the win screen when in win state
   }
+
 
   //image(meteorImage, 0, 0)
 }
@@ -211,6 +219,9 @@ function keyPressed() {
   if (gameState === "startScreen" && (key === ' ' || keyCode === ENTER)) {
     gameState = "gameplay";
     spaceShip.fuel = spaceShip.maxFuel; // Reset fuel
+    showMissionText = true;
+   setTimeout(() => {showMissionText = false;}, 15000)
+    drawMissionText();
   } else if (gameState === "endGame" && keyCode === ENTER) {
     gameState = "startScreen"; // Change back to start screen
     // Reset spaceship properties
@@ -229,8 +240,7 @@ function keyPressed() {
     spaceShip.speed.dy = 0;
     spaceShip.angle = 180; // Reset orientation if needed
     spaceShip.fuel = spaceShip.maxFuel; // Refill fuel
-  }
-  else if (gameState === "collisionEnd" && keyCode === ENTER) {
+  } else if (gameState === "collisionEnd" && keyCode === ENTER) {
     gameState = "startScreen"; // Change back to start screen
     // Reset spaceship properties
     spaceShip.positionX = 1150; // Reset to starting position near Earth
@@ -239,6 +249,15 @@ function keyPressed() {
     spaceShip.speed.dy = 0;
     spaceShip.angle = 180; // Reset orientation if needed
     spaceShip.fuel = spaceShip.maxFuel; // Refill fuel
+  } else if ((gameState === "startScreen" || gameState === "win") && (key === ' ' || keyCode === ENTER)) {
+    gameState = "gameplay";
+    // Reset game state, including the spaceship's position, speed, angle, and fuel
+    spaceShip.positionX = 1150;
+    spaceShip.positionY = 350;
+    spaceShip.speed.dx = 0;
+    spaceShip.speed.dy = -2;
+    spaceShip.angle = 180;
+    spaceShip.fuel = spaceShip.maxFuel;
   }
   return false; // Prevent default behavior
 }
@@ -317,7 +336,7 @@ function drawCollisionEndGameScreen() {
 
 function updateGameplay() {
 
-    if (spaceShip.positionX < -5000 || spaceShip.positionX > 5000 || spaceShip.positionY < -5000 || spaceShip.positionY > 5000) {
+  if (spaceShip.positionX < -5000 || spaceShip.positionX > 5000 || spaceShip.positionY < -5000 || spaceShip.positionY > 5000) {
     gameState = "outOfBounds"; // Change to out-of-bounds state
     drawLostEndGameScreen();
     return;
@@ -333,6 +352,7 @@ function updateGameplay() {
 
   if (checkCollision()) {
     gameState = "collisionEnd";
+    drawCollisionEndGameScreen();
     return; // Stop further drawing or updates since the game is over
   }
 
@@ -347,6 +367,20 @@ function updateGameplay() {
   drawFuelBar();
 }
 
+function drawMissionText() {
+
+   if (showMissionText && frameCount % 60 < 30) {
+
+      let xPosition = 90; // Starting X position of the fuel bar
+      let yPosition = 75; // Adjust Y position so it appears under the fuel bar
+      fill('red'); // White color for the text
+      textSize(32);
+      textAlign(LEFT, TOP);
+      text("Mission: Find Mars", xPosition, yPosition);
+
+
+     }
+}
 
 let isMoving = false; // Tracks whether the spaceship is moving
 
@@ -381,7 +415,7 @@ function handleInput() {
 
 
 function drawFuelBar() {
-  let fuelBarWidth = 100; // Width of the fuel bar
+  let fuelBarWidth = 220; // Width of the fuel bar
   let fuelBarHeight = 20; // Height of the fuel bar
   let xPosition = 90; // X position of the fuel bar
   let yPosition = 50; // Y position of the fuel bar
@@ -445,7 +479,6 @@ function updatePosition() {
   spaceShip.angularVel += spaceShip.angularAcc;
   spaceShip.angularVel *= .9;
   spaceShip.angle += spaceShip.angularVel;
-  console.log(spaceShip.positionX, spaceShip.positionY)
 }
 
 function updateCamera() {
@@ -474,21 +507,44 @@ function drawSolarSystem() {
   });
 }
 
+
 function checkCollision() {
+  let speedMagnitude = sqrt(pow(spaceShip.speed.dx, 2) + pow(spaceShip.speed.dy, 2)); // Calculate the magnitude of the spaceship's speed
+
   for (let i = 0; i < solarSystem.length; i++) {
     let body = solarSystem[i];
+
     // Skip Earth in the collision check
     if (body[0] === "Earth") continue;
 
     let distance = calculateDistance(spaceShip.positionX, spaceShip.positionY, body[1], body[2]);
+    let collisionDistance = body[3] / 2 + 20; // Assuming the spaceship's effective "radius" for collision
 
-    // Assuming the spaceship's effective "radius" for collision is 20 (adjust based on your spaceship size)
-    let collisionDistance = body[3] / 2 + 20; // body[3] is the diameter, so /2 gives the radius
-    if (distance < collisionDistance) {
-      return true; // Collision detected
+    // Special case for Mars: check speed if touching Mars
+    if (body[0] === "Mars" && distance < collisionDistance) {
+      if (speedMagnitude < 5) { // Adjust the speed threshold as needed
+        gameState = "win"; // Change game state to win if speed is low enough
+        return false; // No collision in terms of ending the game
+      }
+      // If speed is too high, treat it as a normal collision
+    } else if (distance < collisionDistance) {
+      return true; // Collision detected with other bodies
     }
   }
   return false; // No collision
+}
+
+// Add a drawWinScreen function
+function drawWinScreen() {
+  drawStarfield(); // Draw the star background first
+
+  textSize(40); // Set the text size
+  textAlign(CENTER, CENTER); // Align text to be centered
+  fill(255, 215, 0); // Gold color for the win message
+  text("CONGRATULATIONS, YOU'VE LANDED ON MARS!", width / 2, height / 2);
+
+  textSize(22); // Smaller text for the restart instruction
+  text("Press ENTER to restart", width / 2, height / 2 + 50);
 }
 
 
