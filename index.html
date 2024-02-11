@@ -12,10 +12,23 @@
   </head>
   <body>
       
-    
+    <div style="padding-top: 2%">
+      <img src="assets/title.png">
+    </div>
     <div id="game">
     <!-- p5 window here! -->
     </div>
-      
+    <script>
+      // prevent itch.io scrolling
+      window.addEventListener("keydown", (e) => {
+        if (
+          ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", " "].includes(
+            e.key
+          )
+        ) {
+          e.preventDefault();
+        }
+      });
+    </script>  
   </body>
 </html>
