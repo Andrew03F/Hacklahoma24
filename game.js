@@ -163,11 +163,12 @@ function drawStartScreen() {
 function drawTitleText() {
   textFont(font);
   // Title "Space Ship"
-  fill(255, 255, 0); // Bright yellow for the title for a classic retro look
-  textSize(64); // Larger size for the title
+  fill(224,201,251); // Bright yellow for the title for a classic retro look
+  textSize(72); // Larger size for the title
   textAlign(CENTER, CENTER);
-  text("Space Ship", width / 2, height / 2 - 50); // Keep the title in its original position
-  
+  text("LUNA NEW YEAR", width / 2, height / 2 - 50); // Keep the title in its original position
+  text("LUNA NEW YEAR", width / 2 + 2, height / 2 - 50 + 2);
+    
   fill(78, 81, 128);
   textSize(22);
   text("W = THRUST, A = L-BOOST, D = R-BOOST", width /6, height - 30);
