@@ -92,7 +92,7 @@ function preload() {
   introSound = loadSound('./assets/intro.wav');
   missionSound = loadSound('./assets/mission.mp3');
   endSound = loadSound('./assets/end.wav');
-  winSound = loadSound('./assets/win.wav')
+  winSound = loadSound('./assets/win.mp3')
 }
 
 
@@ -125,6 +125,7 @@ function draw() {
   if (gameState === "startScreen") {
     if (!introSound.isPlaying()) { // Check if the sound is not already playing
       introSound.play();
+      winSound.pause();
       endSound.pause();
     }
     drawStartScreen();
@@ -189,7 +190,6 @@ function updateAndDrawMeteors() {
     image(meteorImage, m.x - camX, m.y - camY, m.size, m.size);
 
     // Adjusted condition to remove meteors
-    // Ensure meteors are removed only after they fully disappear off the screen
     if (m.x - camX > width + m.size || m.y - camY > height + m.size || m.x - camX < -m.size || m.y - camY < -m.size) {
       meteors.splice(index, 1);
     }
@@ -582,7 +582,7 @@ function checkCollision() {
     let distance = calculateDistance(spaceShip.positionX, spaceShip.positionY, body[1], body[2]);
     let collisionDistance = body[3] / 2 + 20; // Assuming the spaceship's effective "radius" for collision
 
-    // Special case for Mars: check speed if touching Mars
+    // Special case for moon: check speed if touching Mars
     if (body[0] === "Moon" && distance < collisionDistance) {
       if (speedMagnitude < 5) { // Adjust the speed threshold as needed
         gameState = "win"; // Change game state to win if speed is low enough
