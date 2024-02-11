@@ -9,7 +9,7 @@ let spaceShip = {
   angularAcc: 0,
   angularVel: 0,
   baseAcceleration: .1,
-  baseAngularAcceleration: .5,
+  baseAngularAcceleration: .2,
   fuel: 100, // Starting fuel level
   maxFuel: 100, // Maximum fuel capacity
 };
@@ -64,19 +64,12 @@ let fuelBarImage;
 
 function preload() {
   meteorImage = loadImage('./Meteor.png'); // Load the meteor image
-<<<<<<< HEAD
   spaceShipIdleImage = loadImage('./assets/ship1.png');
   spaceShipMovingImage = loadImage('./assets/ship2.png');
   spaceShipFlickerImage1 = loadImage('./assets/ship2.png'); // Replace with the correct path if necessary
   spaceShipFlickerImage2 = loadImage('./assets/ship3.png'); // Replace with the correct path if necessary
   spaceShipImage4 = loadImage('./assets/ship4.png');
   spaceShipImage5 = loadImage('./assets/ship5.png');
-=======
-  spaceShipIdleImage = loadImage('./alien0.png');
-  spaceShipMovingImage = loadImage('./alien.png');
-
-  // planets
->>>>>>> mars
   earthImage = loadImage('./earth.png');
   moonImage = loadImage('./moon.png');
   redPlanetImage = loadImage('./assets/redPlanet.png')
