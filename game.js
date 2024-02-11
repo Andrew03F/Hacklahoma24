@@ -46,10 +46,13 @@ function setupStars() {
 let spaceShipIdleImage; // For the idle state
 let spaceShipMovingImage; // For the moving state
 
+let font;
+
 function preload() {
   meteorImage = loadImage('./Meteor.png'); // Load the meteor image
   spaceShipIdleImage = loadImage('./alien0.png');
   spaceShipMovingImage = loadImage('./alien.png');
+  font = loadFont('./assets/power-clear.ttf');
 }
 
 
@@ -143,11 +146,16 @@ function drawStartScreen() {
 }
 
 function drawTitleText() {
+  textFont(font);
   // Title "Space Ship"
   fill(255, 255, 0); // Bright yellow for the title for a classic retro look
   textSize(64); // Larger size for the title
   textAlign(CENTER, CENTER);
   text("Space Ship", width / 2, height / 2 - 50); // Keep the title in its original position
+  
+  fill(78, 81, 128);
+  textSize(22);
+  text("W = THRUST, A = L-BOOST, D = R-BOOST", width /6, height - 30);
 
   // Blinking effect for "Start Game" text
   if (frameCount % 60 < 30) { // Toggle visibility every 30 frames for blinking effect
@@ -160,6 +168,10 @@ function drawTitleText() {
     fill(255, 255, 0); // Strobe color for shadow/glow
     textSize(33); // Slightly larger size for a glow effect
     text("Start Game", width / 2 + 2, height - 250 + 2); // Offset position for shadow/glow
+      
+    textSize(22);
+    text("insert (1) coin", width / 2 + 2, height - 50);
+    
   }
 }
 
